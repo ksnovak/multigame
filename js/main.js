@@ -38,6 +38,31 @@ $(function() {
 		games.set(Number(game.id), new Game(game));
 	}
 
+	function getGamesList() {
+		console.log(DEBUG_index + ' in getGamesList()');
+
+		$.ajax({
+			type:     'GET',  
+			url:      'https://api.twitch.tv/helix/games/top',  
+			dataType: 'json',  
+			data: 	  { first: 100 },
+			headers:  {  
+				'Client-ID':      APP_CLIENT_ID,  
+				'Authorization':  'Bearer ' + OAUTH_ACCESS_TOKEN  
+			},  
+			error:    function(response) { 
+				console.log(DEBUG_index + ' error')
+			},  
+			success:  function(response) { 
+				response.data.forEach(function(game){
+					setGame(game);
+				})
+				buildGameList();
+			}
+		})
+
+	}
+
 	function getSelectedGames() {
 		console.log(++DEBUG_index + ' in getSelectedGames()');
 		allowSearch(false);
@@ -119,6 +144,19 @@ $(function() {
 		});		
 	}
 
+	function buildGameList() {
+		console.log(++DEBUG_index + ' in buildGameList()');
+
+		var $gameList = $('#gameList');
+		var appendString = '';
+
+		games.forEach(function(game) {
+			appendString += '<option value="' + game.id + '">' + game.name + "</option>";
+		})
+
+		$gameList.html(appendString);
+	}
+
 	function buildTable() {
 		console.log(++DEBUG_index + ' in buildTable()');
 	
@@ -162,7 +200,7 @@ $(function() {
 		allowSearch(true);
 	})
 
-	getSelectedGames();
+	getGamesList();
 
 	
 
