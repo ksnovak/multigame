@@ -12,8 +12,7 @@
         <!-- Place favicon.ico in the root directory -->
 
         <link rel="stylesheet" href="css/normalize.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
+        <link rel="stylesheet" href="css/bootstrap.min.css">
         <link rel="stylesheet" href="css/main.css">
     </head>
     <body>
@@ -31,15 +30,20 @@
         <script src="js/keys.js"></script>        
         <script src="js/main.js"></script>
 
-        <div id='filters'>
-            <label><input type='checkbox' id='englishOnly' checked/> English only?</label>
-            <!--<select id='gameList' class='selectpicker' multiple>
-            </select>-->
+        <form id='filters'>
+        <div class='form-group'>
+            <div class="custom-control custom-checkbox">
+              <input class="custom-control-input" id="englishOnly" checked type="checkbox">
+              <label class="custom-control-label" for="englishOnly">English only?</label>
+            </div>
+            <select id='gameList' class='selectpicker' multiple>
+            </select>
         </div>
+        </form>
 
         <div id='actionButtons'>
-            <button id='search'>Search</button>
-            <button id='clearTable' disabled>Clear it</button>
+            <button id='search' class='btn btn-primary'>Search</button>
+            <button id='clearTable' class='btn btn-secondary' disabled>Clear it</button>
         </div>
 
         <div id='main' class='container-fluid border border-primary' style='border: 1px solid black'>
