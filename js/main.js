@@ -63,15 +63,19 @@ $(function() {
 		})
 
 	}
-
+/*
 	function getSelectedGames() {
 		if (DEBUG_on) console.log(++DEBUG_index + ' in getSelectedGames()');
 		allowSearch(false);
+
 		$.ajax({
 			type:     'GET',  
 			url:      'https://api.twitch.tv/helix/games',  
 			dataType: 'json',  
-			data: 	  { name: ['rimworld'/*, 'dead cells', 'into the breach', 'dungeon of the endless', 'final fantasy xiv online', 'slay the spire', 'they are billions'*/] },
+			data: 	  { 
+				// id: selectedGames
+				name: ['rimworld', 'dead cells', 'into the breach', 'dungeon of the endless', 'final fantasy xiv online', 'slay the spire', 'they are billions'] 
+			},
 			headers:  {  
 				'Client-ID':      APP_CLIENT_ID,  
 				'Authorization':  'Bearer ' + OAUTH_ACCESS_TOKEN  
@@ -86,17 +90,18 @@ $(function() {
 				getStreamers();
 			}
 		})
-	}
+	}*/
 
 	function getStreamers() {
 		if (DEBUG_on) console.log(++DEBUG_index + ' in getStreamers()');
 		console.log('	' + Array.from(games.keys()));
+
 		$.ajax({  
 			type:     'GET',  
 			url:      'https://api.twitch.tv/helix/streams?first=100',  
 			dataType: 'json',  
 			data: {
-				game_id: Array.from(games.keys()),
+				game_id: $('#gameList option:selected').val(),
 				language: $('#englishOnly').prop('checked') ? 'en' : ''
 			},
 			headers:  {  
@@ -204,13 +209,14 @@ $(function() {
 		clearData();
 	});
 	$('#search').click(function() {
-		getSelectedGames()
+		//getSelectedGames()
+		getStreamers();
 	});
 	$('#filters').change(function() {
 		allowSearch(true);
-	})
+	});
 
-	getSelectedGames();
+	getGamesList();
 
 	
 
