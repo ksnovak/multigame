@@ -2,6 +2,7 @@
 $(function() {
 
 	var DEBUG_index = 0;
+	var DEBUG_on = false;
 
 	var gameAspectRatio = 0.75;
 	var gameWidth = 90;
@@ -39,7 +40,7 @@ $(function() {
 	}
 
 	function getGamesList() {
-		console.log(DEBUG_index + ' in getGamesList()');
+		if (DEBUG_on) console.log(DEBUG_index + ' in getGamesList()');
 
 		$.ajax({
 			type:     'GET',  
@@ -51,7 +52,7 @@ $(function() {
 				'Authorization':  'Bearer ' + OAUTH_ACCESS_TOKEN  
 			},  
 			error:    function(response) { 
-				console.log(DEBUG_index + ' error')
+				if (DEBUG_on) console.log(DEBUG_index + ' error')
 			},  
 			success:  function(response) { 
 				response.data.forEach(function(game){
@@ -64,19 +65,19 @@ $(function() {
 	}
 
 	function getSelectedGames() {
-		console.log(++DEBUG_index + ' in getSelectedGames()');
+		if (DEBUG_on) console.log(++DEBUG_index + ' in getSelectedGames()');
 		allowSearch(false);
 		$.ajax({
 			type:     'GET',  
 			url:      'https://api.twitch.tv/helix/games',  
 			dataType: 'json',  
-			data: 	  { name: ['rimworld', 'dead cells', 'into the breach'] },
+			data: 	  { name: ['rimworld'/*, 'dead cells', 'into the breach', 'dungeon of the endless', 'final fantasy xiv online', 'slay the spire', 'they are billions'*/] },
 			headers:  {  
 				'Client-ID':      APP_CLIENT_ID,  
 				'Authorization':  'Bearer ' + OAUTH_ACCESS_TOKEN  
 			},  
 			error:    function(response) { 
-				console.log(DEBUG_index + ' error')
+				if (DEBUG_on) console.log(DEBUG_index + ' error')
 			},  
 			success:  function(response) { 
 				response.data.forEach(function(responseGame) {
@@ -88,7 +89,7 @@ $(function() {
 	}
 
 	function getStreamers() {
-		console.log(++DEBUG_index + ' in getStreamers()');
+		if (DEBUG_on) console.log(++DEBUG_index + ' in getStreamers()');
 		console.log('	' + Array.from(games.keys()));
 		$.ajax({  
 			type:     'GET',  
@@ -103,10 +104,9 @@ $(function() {
 				'Authorization':  'Bearer ' + OAUTH_ACCESS_TOKEN  
 			},  
 			error:    function(response) { 
-				console.log(DEBUG_index + ' error')
+				if (DEBUG_on) console.log(DEBUG_index + ' error')
 			},  
 			success:  function(response) { 
-				console.log('hihi')
 				streamers = [];
 				response.data.forEach(function(stream){ 
 					streamers.push(new Streamer(stream));
@@ -118,7 +118,7 @@ $(function() {
 	}
 
 	function getStreamerNames() {
-		console.log(++DEBUG_index + ' in getStreamerNames()');
+		if (DEBUG_on) console.log(++DEBUG_index + ' in getStreamerNames()');
 		$.ajax({  
 			type:     'GET',  
 			url:      'https://api.twitch.tv/helix/users',  
@@ -131,7 +131,7 @@ $(function() {
 				'Authorization':  'Bearer ' + OAUTH_ACCESS_TOKEN  
 			},  
 			error:    function(response) { 
-				console.log(DEBUG_index + ' error')
+				if (DEBUG_on) console.log(DEBUG_index + ' error')
 			},  
 			success:  function(response) { 
 				response.data.forEach(function(streamer){ 
@@ -145,7 +145,7 @@ $(function() {
 	}
 
 	function buildGameList() {
-		console.log(++DEBUG_index + ' in buildGameList()');
+		if (DEBUG_on) console.log(++DEBUG_index + ' in buildGameList()');
 
 		var $gameList = $('#gameList');
 		var appendString = '';
@@ -158,7 +158,7 @@ $(function() {
 	}
 
 	function buildTable() {
-		console.log(++DEBUG_index + ' in buildTable()');
+		if (DEBUG_on) console.log(++DEBUG_index + ' in buildTable()');
 	
 		var $main = $('#main');
 		var appendString = '';
@@ -166,26 +166,36 @@ $(function() {
 		streamers.forEach(function(streamer) {
 			game = games.get(streamer.game_id);
 
-			appendString += '<tr>' 
-			+ '<td><img src="' + streamer.thumbnail_url + '"/></td>'
-			+ '<td><a href="https://www.twitch.tv/' + streamer.login + '">' + streamer.login + '</a><br/>' + streamer.title + '</td>'
-			+ '<td>' + streamer.viewer_count + ' viewers</td>'
-			+ '<td><img src="' + game.box_art_url + '"/><br>'  + game.name + '</td>'
-			+ '</tr>';
+			appendString += '<div class="row border border-secondary" >' 
+				+ '<div class="col-sm-2">'
+					+ '<img src="' + streamer.thumbnail_url + '" style="width: 100%; max-width: 230px; "/>'
+				+ '</div>'
+				+ '<div class="col-sm-10"><div class="row border border-secondary">'
+					+ '<div class="col-lg-9 col-sm-12 border border-dark">'
+						+ '<a href="https://www.twitch.tv/' + streamer.login + '">' + streamer.login + '</a><br/>' + streamer.title 
+					+ '</div>'
+					+ '<div class="col-lg-1 col-sm-6 border border-dark">' 
+						+ streamer.viewer_count + ' viewers'
+					+ '</div>'
+					+ '<div class="col-lg-2 col-sm-6 border border-dark ">'
+						+ '<div class="d-none d-lg-block"><img src="' + game.box_art_url + '" style="width: 100%; max-width: 90px;"/><br></div>'  + game.name 
+					+ '</div>'
+				+ '</div></div>'
+			+ '</div>';
 		})
 
 		$main.html(appendString);
 	}
 
 	function clearData() {
-		console.log('a in clearData()');
+		if (DEBUG_on) console.log('a in clearData()');
 		allowSearch(true)
 		$('#main').html('');
 		streamers = [];
 	}
 
 	function allowSearch(allowed) {
-		console.log('b in allowSearch()');
+		if (DEBUG_on) console.log('b in allowSearch()');
 		$('#search').prop('disabled', !allowed);
 		$('#clearTable').prop('disabled', allowed);
 	}
@@ -200,7 +210,7 @@ $(function() {
 		allowSearch(true);
 	})
 
-	getGamesList();
+	getSelectedGames();
 
 	
 
