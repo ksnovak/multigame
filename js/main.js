@@ -12,9 +12,11 @@ $(function() {
 
 	class Game {
 		constructor (game) {
-			this.id = Number(game.id);
-			this.name = game.name;
-			this.box_art_url = game.box_art_url.replace('{width}', gameWidth).replace('{height}', parseInt(gameWidth/gameAspectRatio));
+			this.id = Number(game.game._id);
+			this.name = game.game.name;
+			this.box_art_url = game.game.box.medium;
+			this.viewers = game.viewers;
+			this.channels = game.channels;
 		}
 	}
 	class Streamer {
@@ -36,17 +38,17 @@ $(function() {
 	var streamers = new Map();
 
 	function setGame(game) { 
-		games.set(Number(game.id), new Game(game));
+		games.set(Number(game.game._id), new Game(game));
 	}
 
-	function getGamesList() {
-		if (DEBUG_on) console.log(DEBUG_index + ' in getGamesList()');
+	function getTopGames() {
+		if (DEBUG_on) console.log(DEBUG_index + ' in getTopGames()');
 
 		$.ajax({
 			type:     'GET',  
-			url:      'https://api.twitch.tv/helix/games/top',  
+			url:      'https://api.twitch.tv/kraken/games/top',  
 			dataType: 'json',  
-			data: 	  { first: 100 },
+			data: 	  { limit: 100 },
 			headers:  {  
 				'Client-ID':      APP_CLIENT_ID,  
 				'Authorization':  'Bearer ' + OAUTH_ACCESS_TOKEN  
@@ -55,7 +57,7 @@ $(function() {
 				if (DEBUG_on) console.log(DEBUG_index + ' error')
 			},  
 			success:  function(response) { 
-				response.data.forEach(function(game){
+				response.top.forEach(function(game){
 					setGame(game);
 				})
 				buildGameList();
@@ -66,7 +68,6 @@ $(function() {
 /*
 	function getSelectedGames() {
 		if (DEBUG_on) console.log(++DEBUG_index + ' in getSelectedGames()');
-		allowSearch(false);
 
 		$.ajax({
 			type:     'GET',  
@@ -90,18 +91,27 @@ $(function() {
 				getStreamers();
 			}
 		})
-	}*/
+	}
+*/
 
 	function getStreamers() {
 		if (DEBUG_on) console.log(++DEBUG_index + ' in getStreamers()');
-		console.log('	' + Array.from(games.keys()));
+		// console.log('	' + Array.from(games.keys()));
+
+		var gamesList = $('#gameList').val();
+
+		if (gamesList.length == 0) {
+			alert('No games selected');
+
+			return;
+		}
 
 		$.ajax({  
 			type:     'GET',  
 			url:      'https://api.twitch.tv/helix/streams?first=100',  
 			dataType: 'json',  
 			data: {
-				game_id: $('#gameList option:selected').val(),
+				game_id: gamesList,
 				language: $('#englishOnly').prop('checked') ? 'en' : ''
 			},
 			headers:  {  
@@ -156,7 +166,7 @@ $(function() {
 		var appendString = '';
 
 		games.forEach(function(game) {
-			appendString += '<option value="' + game.id + '">' + game.name + "</option>";
+			appendString += '<option value="' + game.id + '">' + game.name + /*" (" + game.viewers + " viewers, on " + game.channels + " channels)" + */"</option>";
 		})
 
 		$gameList.html(appendString);
@@ -171,9 +181,10 @@ $(function() {
 		streamers.forEach(function(streamer) {
 			game = games.get(streamer.game_id);
 
+
 			appendString += '<div class="row border border-secondary" >' 
-				+ '<div class="col-sm-2">'
-					+ '<img src="' + streamer.thumbnail_url + '" style="width: 100%; max-width: 230px; "/>'
+				+ '<div class="col-sm-2" style="padding: 0px;">'
+					+ '<img src="' + streamer.thumbnail_url + '" style="width: 100%;"/>'
 				+ '</div>'
 				+ '<div class="col-sm-10"><div class="row border border-secondary">'
 					+ '<div class="col-lg-9 col-sm-12 border border-dark">'
@@ -194,15 +205,8 @@ $(function() {
 
 	function clearData() {
 		if (DEBUG_on) console.log('a in clearData()');
-		allowSearch(true)
 		$('#main').html('');
 		streamers = [];
-	}
-
-	function allowSearch(allowed) {
-		if (DEBUG_on) console.log('b in allowSearch()');
-		$('#search').prop('disabled', !allowed);
-		$('#clearTable').prop('disabled', allowed);
 	}
 
 	$('#clearTable').click(function(){
@@ -211,12 +215,8 @@ $(function() {
 	$('#search').click(function() {
 		//getSelectedGames()
 		getStreamers();
-	});
-	$('#filters').change(function() {
-		allowSearch(true);
-	});
-
-	getGamesList();
+	})
+	getTopGames();
 
 	
 

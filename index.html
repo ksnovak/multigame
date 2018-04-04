@@ -19,9 +19,7 @@
         <script src="js/vendor/bootstrap.bundle.min.js"></script>
 
         <script src="js/vendor/modernizr-3.5.0.min.js"></script>
-
-        <link rel="stylesheet" href="css/bootstrap-multiselect.css">
-        <script src="js/vendor/bootstrap-multiselect.js"></script>
+    
 
         <script src="js/plugins.js"></script>
         <link rel="stylesheet" href="css/main.css">
@@ -30,7 +28,7 @@
 
 
     </head>
-    <body>
+    <body class='fuelux'>
         <!--[if lte IE 9]>
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
         <![endif]-->
@@ -38,24 +36,32 @@
         <!-- Add your site or application content here -->
         <p>Hello world! This is HTML5 Boilerplate.</p>
 
-        <form id='filters'>
-        <div class='form-group col-sm-6 '>
-            <div class="custom-control custom-checkbox">
-              <input class="custom-control-input" id="englishOnly" checked type="checkbox">
-              <label class="custom-control-label" for="englishOnly">English only?</label>
+        <div class='row'>
+
+            <div class='form-group col-sm-6'>                
+                <div id='filters' class="custom-control custom-checkbox">
+                  <input class="custom-control-input" id="englishOnly" checked type="checkbox">
+                  <label class="custom-control-label" for="englishOnly">English only?</label>
+                </div>
+                <label>Top games: <select id='gameList' multiple="multiple" class='form-control col-sm-8'></select></label>
+                <br/>
+
+                <div id='actionButtons'>
+                    <button id='search' class='btn btn-primary'>Search</button>
+                    <button id='clearTable' class='btn btn-secondary'>Clear Results</button>
+                </div>
             </div>
-            <select id='gameList' multiple="multiple" class='form-control col-sm-4'>
-            </select>
-
+            <div class='col-sm-6'>
+                <ul>
+                    <li>Caching/local storage for top game list</li>
+                    <li>Mix top games & specified games</li>
+                    <li>Visual selection for games</li>
+                    <li>game search filtering</li>
+                    <li>Query string for pre-defined games</li>
+                </ul>
+            </div>
         </div>
-        </form>
-
-        <div id='actionButtons'>
-            <button id='search' class='btn btn-primary'>Search</button>
-            <button id='clearTable' class='btn btn-secondary' disabled>Clear it</button>
-        </div>
-
-        <div id='main' class='container-fluid border border-primary'>
+        <div id='main' class='container-fluid'>
 
         </div>
     </body>
