@@ -12,11 +12,20 @@ $(function() {
 
 	class Game {
 		constructor (game) {
-			this.id = Number(game.game._id);
-			this.name = game.game.name;
-			this.box_art_url = game.game.box.medium;
-			this.viewers = game.viewers;
-			this.channels = game.channels;
+
+			if (game.id) {
+				this.id = Number(game.id);
+				this.name = game.name;
+				this.box_art_url = game.box_art_url.replace('{width}', gameWidth).replace('{height}', parseInt(gameWidth/gameAspectRatio));
+			}
+			else {
+				this.id = Number(game.game._id);
+				this.name = game.game.name;
+				this.box_art_url = game.game.box.medium;
+				this.viewers = game.viewers;
+				this.channels = game.channels;
+			}
+
 		}
 	}
 	class Streamer {
@@ -38,7 +47,14 @@ $(function() {
 	var streamers = new Map();
 
 	function setGame(game) { 
-		games.set(Number(game.game._id), new Game(game));
+		var gameID = Number(game.id || game.game._id);
+		if (!games.get(gameID)) {
+			games.set(Number(gameID), new Game(game));
+			$('#gameList').append('<option value="' + game.id + '" selected>' + (game.name || game.game.name) + "</option>");
+		}
+		else {
+			$('#gameList option[value=' + gameID +']').prop('selected', true)
+		}
 	}
 
 	function getTopGames() {
@@ -48,7 +64,7 @@ $(function() {
 			type:     'GET',  
 			url:      'https://api.twitch.tv/kraken/games/top',  
 			dataType: 'json',  
-			data: 	  { limit: 100 },
+			data: 	  { limit: 5 },
 			headers:  {  
 				'Client-ID':      APP_CLIENT_ID,  
 				'Authorization':  'Bearer ' + OAUTH_ACCESS_TOKEN  
@@ -65,9 +81,9 @@ $(function() {
 		})
 
 	}
-/*
-	function getSelectedGames() {
-		if (DEBUG_on) console.log(++DEBUG_index + ' in getSelectedGames()');
+
+	function searchGameName() {
+		if (DEBUG_on) console.log(++DEBUG_index + ' in searchGameName()');
 
 		$.ajax({
 			type:     'GET',  
@@ -75,7 +91,7 @@ $(function() {
 			dataType: 'json',  
 			data: 	  { 
 				// id: selectedGames
-				name: ['rimworld', 'dead cells', 'into the breach', 'dungeon of the endless', 'final fantasy xiv online', 'slay the spire', 'they are billions'] 
+				name:  $('#customGames').val().split(', ')
 			},
 			headers:  {  
 				'Client-ID':      APP_CLIENT_ID,  
@@ -85,14 +101,18 @@ $(function() {
 				if (DEBUG_on) console.log(DEBUG_index + ' error')
 			},  
 			success:  function(response) { 
+
+				
 				response.data.forEach(function(responseGame) {
 					setGame(responseGame);
 				})
 				getStreamers();
+
+				console.log(response);
 			}
 		})
 	}
-*/
+
 
 	function getStreamers() {
 		if (DEBUG_on) console.log(++DEBUG_index + ' in getStreamers()');
@@ -100,11 +120,11 @@ $(function() {
 
 		var gamesList = $('#gameList').val();
 
-		if (gamesList.length == 0) {
-			alert('No games selected');
+		// if (gamesList.length == 0) {
+		// 	alert('No games selected');
 
-			return;
-		}
+		// 	return;
+		// }
 
 		$.ajax({  
 			type:     'GET',  
@@ -166,7 +186,7 @@ $(function() {
 		var appendString = '';
 
 		games.forEach(function(game) {
-			appendString += '<option value="' + game.id + '">' + game.name + /*" (" + game.viewers + " viewers, on " + game.channels + " channels)" + */"</option>";
+			appendString += '<option value="' + game.id + '">' + game.name + "</option>";
 		})
 
 		$gameList.html(appendString);
@@ -208,14 +228,25 @@ $(function() {
 		$('#main').html('');
 		streamers = [];
 	}
+	function clearSearch() {
+		$('#customGames').val('');
+		$('#gameList').val([])
+		$('#gameList option:selected').removeattr('selected')
+	}
 
 	$('#clearTable').click(function(){
 		clearData();
 	});
 	$('#search').click(function() {
-		//getSelectedGames()
-		getStreamers();
+		if ($('#customGames').val())
+			searchGameName()
+		else 
+			getStreamers();
 	})
+	$('#clearSearch').click(function(){
+		clearSearch();
+	})
+
 	getTopGames();
 
 	
