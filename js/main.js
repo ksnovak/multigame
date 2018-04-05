@@ -64,7 +64,7 @@ $(function() {
 			type:     'GET',  
 			url:      'https://api.twitch.tv/kraken/games/top',  
 			dataType: 'json',  
-			data: 	  { limit: 5 },
+			data: 	  { limit: 40 },
 			headers:  {  
 				'Client-ID':      APP_CLIENT_ID,  
 				'Authorization':  'Bearer ' + OAUTH_ACCESS_TOKEN  
